@@ -6,6 +6,7 @@ import mcaxolotl.bbsvanillabone.client.bones.BoneHierarchy;
 import mcaxolotl.bbsvanillabone.client.bones.MobRenderContext;
 import mcaxolotl.bbsvanillabone.client.bones.VanillaRendererBones;
 import mcaxolotl.bbsvanillabone.client.mixin.MobFormRendererAccessor;
+import mcaxolotl.bbsvanillabone.forms.MobFormValues;
 import mchorse.bbs_mod.BBSModClient;
 import mchorse.bbs_mod.client.BBSShaders;
 import mchorse.bbs_mod.forms.CustomVertexConsumerProvider;

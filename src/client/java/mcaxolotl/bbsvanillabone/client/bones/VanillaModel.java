@@ -58,6 +58,18 @@ public final class VanillaModel implements IModel
         return this.labels.get(id);
     }
 
+    /**
+     * {@link #getLabel} with the id itself as the fallback, for the display surfaces that need
+     * <em>some</em> text: an unknown or unlabelled bone reads as its raw id rather than blank.
+     * Display only, on the same terms as {@link #getLabel}.
+     */
+    public String labelOrId(String id)
+    {
+        String label = this.getLabel(id);
+
+        return label == null || label.isEmpty() ? id : label;
+    }
+
     @Override
     public Collection<String> getRootGroupKeys()
     {

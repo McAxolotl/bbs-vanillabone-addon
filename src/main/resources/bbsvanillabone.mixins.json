@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "mcaxolotl.bbsvanillabone.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"MobFormMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

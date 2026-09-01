@@ -1,5 +1,6 @@
 package mcaxolotl.bbsvanillabone.client.forms;
 
+import mcaxolotl.bbsvanillabone.forms.MobFormValues;
 import mchorse.bbs_mod.forms.FormUtils;
 import mchorse.bbs_mod.forms.forms.MobForm;
 import mchorse.bbs_mod.settings.values.core.ValuePose;

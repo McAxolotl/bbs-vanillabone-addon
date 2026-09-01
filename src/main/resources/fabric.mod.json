@@ -9,7 +9,7 @@
 	],
 	"contact": {},
 	"license": "MIT",
-	"environment": "client",
+	"environment": "*",
 	"entrypoints": {
 		"bbs-addon": [
 			"mcaxolotl.bbsvanillabone.BBSVanillaBoneAddon"
@@ -19,6 +19,7 @@
 		]
 	},
 	"mixins": [
+		"bbsvanillabone.mixins.json",
 		{
 			"config": "bbsvanillabone.client.mixins.json",
 			"environment": "client"

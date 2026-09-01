@@ -2,7 +2,7 @@ package mcaxolotl.bbsvanillabone.client.ui;
 
 import mcaxolotl.bbsvanillabone.client.bones.BoneHierarchy;
 import mcaxolotl.bbsvanillabone.client.bones.VanillaModel;
-import mcaxolotl.bbsvanillabone.client.forms.MobFormValues;
+import mcaxolotl.bbsvanillabone.forms.MobFormValues;
 import mcaxolotl.bbsvanillabone.client.forms.VanillaBoneMobFormRenderer;
 import mchorse.bbs_mod.forms.FormUtilsClient;
 import mchorse.bbs_mod.forms.forms.MobForm;

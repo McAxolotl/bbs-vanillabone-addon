@@ -1,4 +1,4 @@
-package mcaxolotl.bbsvanillabone.client.forms;
+package mcaxolotl.bbsvanillabone.forms;
 
 import mchorse.bbs_mod.forms.forms.MobForm;
 import mchorse.bbs_mod.settings.values.core.ValueColor;
@@ -14,6 +14,11 @@ import java.util.List;
  * MobForm. A duck interface is used rather than a static side table because these are real
  * ValueGroup children: they serialize with the form, survive a save/load round trip and show up in
  * the host's generic property enumeration. A side table would give none of that.</p>
+ *
+ * <p>Common source set on purpose: the mixin that implements this has to apply on a dedicated
+ * server too, or the server drops these keys out of every form it round trips. See MobFormMixin for
+ * the round trips in question. Everything that reads these values is client side, but the interface
+ * follows the mixin.</p>
  *
  * <p>Serialization keys match bbs-fsv exactly ({@code color}, {@code paused}, {@code bone_tracks},
  * {@code pose_overlay0..n}), so a form written by either build reads back on the other. The order

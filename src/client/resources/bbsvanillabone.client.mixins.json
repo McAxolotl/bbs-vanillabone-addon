@@ -7,7 +7,6 @@
 		"EntityModelLoaderMixin",
 		"FormPropertiesMixin",
 		"LivingEntityRendererAccessor",
-		"MobFormMixin",
 		"MobFormRendererAccessor",
 		"ModelPartAccessor",
 		"ModelPartMixin",

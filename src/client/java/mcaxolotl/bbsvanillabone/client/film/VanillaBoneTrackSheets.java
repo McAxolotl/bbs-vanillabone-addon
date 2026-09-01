@@ -2,7 +2,7 @@ package mcaxolotl.bbsvanillabone.client.film;
 
 import mcaxolotl.bbsvanillabone.client.bones.BoneHierarchy;
 import mcaxolotl.bbsvanillabone.client.bones.VanillaModel;
-import mcaxolotl.bbsvanillabone.client.forms.MobFormValues;
+import mcaxolotl.bbsvanillabone.forms.MobFormValues;
 import mcaxolotl.bbsvanillabone.client.forms.VanillaBoneMobFormRenderer;
 import mchorse.bbs_mod.film.replays.FormProperties;
 import mchorse.bbs_mod.film.replays.PerLimbService;
@@ -118,7 +118,8 @@ public final class VanillaBoneTrackSheets
              * carries the short label the bone tree shows. The two must not be swapped — a short
              * name in the key yields a track that records and saves but moves nothing. */
             String boneKey = PerLimbService.toPoseBoneKey(path, bone);
-            String title = path.isEmpty() ? labelOf(model, bone) : path + "/" + labelOf(model, bone);
+            String label = model.labelOrId(bone);
+            String title = path.isEmpty() ? label : path + "/" + label;
             KeyframeChannel channel = properties.registerChannel(boneKey, KeyframeFactories.POSE_TRANSFORM);
             ValueTransform transform = new ValueTransform(boneKey, new PoseTransform());
 
@@ -202,13 +203,6 @@ public final class VanillaBoneTrackSheets
                 limbChannel.get(index).copyOverExtra(keyframe);
             }
         }
-    }
-
-    private static String labelOf(VanillaModel model, String bone)
-    {
-        String label = model.getLabel(bone);
-
-        return label == null || label.isEmpty() ? bone : label;
     }
 
     /**

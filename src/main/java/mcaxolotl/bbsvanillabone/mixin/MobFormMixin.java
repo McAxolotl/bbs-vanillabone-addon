@@ -1,6 +1,6 @@
-package mcaxolotl.bbsvanillabone.client.mixin;
+package mcaxolotl.bbsvanillabone.mixin;
 
-import mcaxolotl.bbsvanillabone.client.forms.MobFormValues;
+import mcaxolotl.bbsvanillabone.forms.MobFormValues;
 import mchorse.bbs_mod.BBSSettings;
 import mchorse.bbs_mod.forms.forms.MobForm;
 import mchorse.bbs_mod.settings.values.core.ValueColor;
@@ -31,6 +31,17 @@ import java.util.List;
  * initialisers, so there is no question about how Mixin transplants initialisers. ValueGroup.add is
  * public and the merged code runs as part of MobForm's own constructor, which is what makes these
  * behave like the host's own values: serialized, enumerated as properties, keyframable.</p>
+ *
+ * <p><strong>This is the one part of the addon that has to apply on a dedicated server</strong>,
+ * which is why it lives in the common source set and its config (bbsvanillabone.mixins.json) is
+ * declared without an environment. The host builds real MobForm instances server side: a film LOAD
+ * reads the film on the server and sends film.toData() back to the client
+ * (ServerNetwork.LOAD / SAVE), and morph and form sync round trip forms the same way. ValueGroup
+ * .fromData assigns only the keys the group already holds and drops the rest, so a client-only
+ * version of this mixin would have a server strip color / paused / bone_tracks /
+ * pose_overlay0..n out of every form that passes through it, and the client's next save would
+ * write the stripped form back — silent, permanent data loss. The price is that the server needs
+ * the addon installed as well.</p>
  *
  * <p>BBSSettings.recordingPoseTransformOverlays is read unguarded, exactly as the host's own
  * ModelForm constructor reads it — a MobForm built before the settings exist would already have

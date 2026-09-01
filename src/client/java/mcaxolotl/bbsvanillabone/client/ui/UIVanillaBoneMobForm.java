@@ -2,7 +2,7 @@ package mcaxolotl.bbsvanillabone.client.ui;
 
 import mcaxolotl.bbsvanillabone.client.BBSVanillaBoneClientAddon;
 import mcaxolotl.bbsvanillabone.client.forms.MobFormPose;
-import mcaxolotl.bbsvanillabone.client.forms.MobFormValues;
+import mcaxolotl.bbsvanillabone.forms.MobFormValues;
 import mchorse.bbs_mod.data.DataStorageUtils;
 import mchorse.bbs_mod.data.types.MapType;
 import mchorse.bbs_mod.forms.FormUtils;

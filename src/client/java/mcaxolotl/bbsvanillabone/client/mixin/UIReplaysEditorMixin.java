@@ -1,7 +1,7 @@
 package mcaxolotl.bbsvanillabone.client.mixin;
 
 import mcaxolotl.bbsvanillabone.client.film.VanillaBoneTrackSheets;
-import mcaxolotl.bbsvanillabone.client.forms.MobFormValues;
+import mcaxolotl.bbsvanillabone.forms.MobFormValues;
 import mchorse.bbs_mod.film.replays.Replay;
 import mchorse.bbs_mod.forms.FormUtils;
 import mchorse.bbs_mod.forms.forms.Form;
