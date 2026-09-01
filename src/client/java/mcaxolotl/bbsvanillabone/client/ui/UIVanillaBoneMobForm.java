@@ -155,13 +155,14 @@ public class UIVanillaBoneMobForm extends UIForm<MobForm>
     }
 
     /**
-     * The additive euler base under the pose editor's channels for the selected bone: the bone's
-     * evaluated rotation (vanilla's own animation plus the whole pose stack) minus the edited track's
-     * own contribution, so gizmo deltas compose at the angle the bone actually renders at.
+     * The additive euler base under the pose editor's channels for the selected bone: the rotation
+     * of the form's other pose tracks, and nothing else.
      *
-     * <p>This matters more for vanilla bones than for model bones: vanilla setAngles writes non-zero
-     * angles to heads and limbs every frame, so a zero base would put every rotation drag out by
-     * whatever the animation was doing.</p>
+     * <p>Notably <em>not</em> the bone's evaluated rotation. Vanilla's animation angle reaches the
+     * bone as its own quaternion factor rather than as a summand, and the drag already measures that
+     * factor numerically; adding it here counts it twice, which drifts the drag gain and turns the
+     * euler branch flip into a visible jump. Zero is the right answer for a bone whose only pose
+     * track is the one being dragged, however far vanilla has rotated it.</p>
      *
      * <p>Public because the shell's own gate on it is private and typed to the model form; the
      * UIFormEditorMixin forwards here.</p>
@@ -180,7 +181,7 @@ public class UIVanillaBoneMobForm extends UIForm<MobForm>
             return null;
         }
 
-        return MobFormPose.additiveRotationBase(this.form, this.form.pose, bone, this.getEvaluatedRotation(transition, this.bonePath()));
+        return MobFormPose.additiveRotationBase(this.form, this.form.pose, bone);
     }
 
     /**

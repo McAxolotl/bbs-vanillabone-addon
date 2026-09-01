@@ -13,7 +13,10 @@
 		"UIAnimationStateEditorMixin",
 		"UIBodyPartEditorMixin",
 		"UIBoneTreeListMixin",
+		"UIFilmControllerMixin",
 		"UIFormEditorMixin",
+		"UIKeyframePreviewTooltipMixin",
+		"UIPickableFormRendererMixin",
 		"UIPoseKeyframeFactoryMixin",
 		"UIReplaysEditorMixin",
 		"UIReplaysEditorUtilsMixin"

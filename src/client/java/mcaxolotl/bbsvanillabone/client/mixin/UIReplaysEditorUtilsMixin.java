@@ -4,7 +4,6 @@ import mcaxolotl.bbsvanillabone.client.bones.BoneHierarchy;
 import mcaxolotl.bbsvanillabone.client.bones.VanillaModel;
 import mcaxolotl.bbsvanillabone.client.film.VanillaBoneTrackSheets;
 import mcaxolotl.bbsvanillabone.client.forms.MobFormPose;
-import mchorse.bbs_mod.film.BaseFilmController;
 import mchorse.bbs_mod.film.replays.FormProperties;
 import mchorse.bbs_mod.forms.FormUtils;
 import mchorse.bbs_mod.forms.entities.IEntity;
@@ -123,9 +122,7 @@ public class UIReplaysEditorUtilsMixin
             return;
         }
 
-        Vector3f evaluated = BaseFilmController.getGizmoBoneEvaluatedRotation(entity, transition, bonePath);
-
-        info.setReturnValue(MobFormPose.additiveRotationBase(mobForm, valuePose, bone, evaluated));
+        info.setReturnValue(MobFormPose.additiveRotationBase(mobForm, valuePose, bone));
     }
 
     /** Ctrl+click's sibling-bone menu, for a mob form. */

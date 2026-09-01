@@ -15,6 +15,16 @@ import java.util.List;
  *
  * <p>Shared by the two places that ask for it — the form editor's gizmo and the film timeline's
  * gizmo — so the same drag cannot behave differently depending on which one is open.</p>
+ *
+ * <p><strong>Only sibling pose tracks belong in this number.</strong> The gizmo's contract is that
+ * the renderer shows {@code ZYX(base + channels)}, and for a vanilla bone only half of what reaches
+ * the bone is additive: overlay tracks really are summed per channel, but the animation angle
+ * vanilla writes is composed as a separate quaternion factor. That factor is already accounted for —
+ * the drag measures its rotate axes numerically, by perturbing each channel and resampling the
+ * matrix, so a multiplicative outer factor is absorbed exactly. Feeding it in here as well
+ * double-counts it: the recovered parent frame stops being a rotation, the drag gain drifts, and the
+ * euler branch flip that keeps {@code ZYX(total)} continuous stops keeping {@code ZYX(total - base)}
+ * continuous, which is a hard jump mid-drag.</p>
  */
 public final class MobFormPose
 {
@@ -22,20 +32,14 @@ public final class MobFormPose
     {}
 
     /**
-     * The host's additive rotation base, computed over every pose track a mob form has here.
+     * The summed rotation of every pose track on this form except the one being edited.
      *
-     * <p>Not delegated to {@code FormUtils.additivePoseRotationBase}. That helper builds its track
-     * list from the two pose values upstream's MobForm declares, so it cannot see the
-     * {@code pose_overlay0..n} this addon appends, and the omission costs more than the additivity
-     * guard: the fallback sum would be short by the overlays' own rotation, and an edit to an
-     * overlay track would find itself missing from the list and give up entirely. Recomputing the
-     * whole thing here is the only way the answer matches bbs-fsv, where all the tracks sit in one
-     * list to begin with.</p>
-     *
-     * <p>Reachable only when the recording overlay count is turned up — it defaults to zero, which
-     * leaves the overlay list empty and every path below identical to the host's.</p>
+     * <p>Zero unless recording overlays are turned on, which is what makes the common case behave
+     * exactly like the fork — the fork returns nothing here at all. Where the two differ is with
+     * overlays present: those are genuinely additive, and leaving them out of the base makes a drag
+     * miss by their rotation.</p>
      */
-    public static Vector3f additiveRotationBase(MobForm form, ValuePose editedTrack, String bone, Vector3f evaluatedRadians)
+    public static Vector3f additiveRotationBase(MobForm form, ValuePose editedTrack, String bone)
     {
         List<ValuePose> tracks = new ArrayList<>();
 
@@ -49,34 +53,26 @@ public final class MobFormPose
         }
 
         Vector3f trackSum = new Vector3f();
-        Vector3f editedContribution = new Vector3f();
 
         for (ValuePose track : tracks)
         {
             PoseTransform transform = track.get().transforms.get(bone);
 
-            if (transform == null)
+            if (transform == null || track == editedTrack)
             {
                 continue;
             }
 
-            /* One multiplicative contributor and the additive-base model stops describing the
-             * result at all, so there is no partial answer to give. */
+            /* One multiplicative contributor and the additive model stops describing the stack at
+             * all, so there is no partial answer to give. */
             if (transform.rotationMode == Transform.RotationMode.QUATERNION || transform.fix != 0F)
             {
                 return null;
             }
 
-            if (track == editedTrack)
-            {
-                editedContribution.set(transform.rotate);
-            }
-            else
-            {
-                trackSum.add(transform.rotate);
-            }
+            trackSum.add(transform.rotate);
         }
 
-        return evaluatedRadians == null ? trackSum : new Vector3f(evaluatedRadians).sub(editedContribution);
+        return trackSum;
     }
 }
