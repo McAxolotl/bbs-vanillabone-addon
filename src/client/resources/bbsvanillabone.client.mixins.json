@@ -10,8 +10,11 @@
 		"MobFormRendererAccessor",
 		"ModelPartAccessor",
 		"ModelPartMixin",
+		"UIAnimationStateEditorMixin",
+		"UIBodyPartEditorMixin",
 		"UIBoneTreeListMixin",
 		"UIFormEditorMixin",
+		"UIPoseKeyframeFactoryMixin",
 		"UIReplaysEditorMixin",
 		"UIReplaysEditorUtilsMixin"
 	],
