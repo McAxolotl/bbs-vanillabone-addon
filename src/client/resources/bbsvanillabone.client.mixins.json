@@ -10,6 +10,7 @@
 		"MobFormRendererAccessor",
 		"ModelPartAccessor",
 		"ModelPartMixin",
+		"UIBoneTreeListMixin",
 		"UIFormEditorMixin"
 	],
 	"injectors": {

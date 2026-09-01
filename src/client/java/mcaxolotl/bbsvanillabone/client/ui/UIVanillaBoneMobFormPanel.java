@@ -35,8 +35,9 @@ import java.util.List;
  * <p>None of the pose widgets are written here: the host already ships the whole stack
  * (UIModelPoseEditor with its bone tree, per-bone transform, fix, colour and lighting) and drives
  * it from an {@link mchorse.bbs_mod.cubic.IModel}, so a vanilla bone hierarchy reaches it through
- * the VanillaModel adapter and nothing else is needed. Bones therefore show up under their raw
- * stable ids (minecraft:zombie#main/head) — the readable short-name pass is a separate step.</p>
+ * the VanillaModel adapter and nothing else is needed. The tree rows read as short names
+ * (mcaxolotl.bbsvanillabone.client.mixin.UIBoneTreeListMixin) while the list values stay the
+ * stable ids (minecraft:zombie#main/head) that the pose is keyed by.</p>
  */
 public class UIVanillaBoneMobFormPanel extends UIFormPanel<MobForm>
 {

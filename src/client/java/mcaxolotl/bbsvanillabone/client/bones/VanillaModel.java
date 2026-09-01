@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,9 +25,37 @@ public final class VanillaModel implements IModel
 {
     private final BoneHierarchy hierarchy;
 
+    /** Built on first use: {@link BoneHierarchy#getLabel} rebuilds the whole label map per call,
+     *  and the bone tree asks for one label per bone. An adapter instance lives for one fill. */
+    private Map<String, String> labels;
+
     public VanillaModel(BoneHierarchy hierarchy)
     {
         this.hierarchy = hierarchy;
+    }
+
+    /**
+     * The readable short name of a bone id ({@code head} for {@code minecraft:zombie#main/head}),
+     * or null for an id this hierarchy doesn't know.
+     *
+     * <p><strong>Display only.</strong> Everything persisted — pose keys, film bone tracks,
+     * {@code BodyPart.bone} — keeps using the stable id, so a short name must never be written
+     * back into data. The one consumer is UIBoneTreeListMixin, which swaps it into the tree row's
+     * label while the list value stays the id.</p>
+     */
+    public String getLabel(String id)
+    {
+        if (id == null)
+        {
+            return null;
+        }
+
+        if (this.labels == null)
+        {
+            this.labels = this.hierarchy.getLabels(false);
+        }
+
+        return this.labels.get(id);
     }
 
     @Override
