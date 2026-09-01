@@ -12,7 +12,9 @@
 		"ModelPartAccessor",
 		"ModelPartMixin",
 		"UIBoneTreeListMixin",
-		"UIFormEditorMixin"
+		"UIFormEditorMixin",
+		"UIReplaysEditorMixin",
+		"UIReplaysEditorUtilsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

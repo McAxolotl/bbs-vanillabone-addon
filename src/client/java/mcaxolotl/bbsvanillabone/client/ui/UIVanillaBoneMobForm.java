@@ -1,22 +1,23 @@
 package mcaxolotl.bbsvanillabone.client.ui;
 
 import mcaxolotl.bbsvanillabone.client.BBSVanillaBoneClientAddon;
+import mcaxolotl.bbsvanillabone.client.forms.MobFormPose;
 import mcaxolotl.bbsvanillabone.client.forms.MobFormValues;
 import mchorse.bbs_mod.data.DataStorageUtils;
 import mchorse.bbs_mod.data.types.MapType;
 import mchorse.bbs_mod.forms.FormUtils;
 import mchorse.bbs_mod.forms.forms.MobForm;
-import mchorse.bbs_mod.settings.values.core.ValuePose;
 import mchorse.bbs_mod.ui.UIKeys;
 import mchorse.bbs_mod.ui.forms.editors.forms.UIForm;
+import mchorse.bbs_mod.ui.framework.elements.buttons.UIToggle;
 import mchorse.bbs_mod.ui.framework.elements.input.UIPropTransform;
 import mchorse.bbs_mod.ui.framework.elements.input.drag.TransformSpace;
 import mchorse.bbs_mod.ui.utils.icons.Icons;
 import mchorse.bbs_mod.utils.StringUtils;
-import mchorse.bbs_mod.utils.pose.PoseTransform;
-import mchorse.bbs_mod.utils.pose.Transform;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import java.util.function.Consumer;
 
 /**
  * Stands in for the host's UIMobForm. Only the per-type panel stack is replaceable — the editor
@@ -56,6 +57,52 @@ public class UIVanillaBoneMobForm extends UIForm<MobForm>
 
             BBSVanillaBoneClientAddon.LOGGER.info("mob form editor panel taken over: the host built a {}", this.getClass().getSimpleName());
         }
+    }
+
+    /**
+     * Makes the general panel's "bone tracks" switch write to a mob form.
+     *
+     * <p>The host's own callback is written {@code if (this.form instanceof ModelForm m)}, so on a
+     * mob form the toggle flips visually and stores nothing. Wrapping the callback rather than
+     * mixing into the panel is possible because {@code UIClickable.callback} is a public field: the
+     * host's own handler still runs first (it is a no-op here), then the value lands on the mob
+     * form. No new UI element is introduced, so the switch keeps its place, tooltip and label.</p>
+     */
+    @Override
+    protected void registerDefaultPanels()
+    {
+        super.registerDefaultPanels();
+
+        Consumer<UIToggle> hostCallback = this.generalPanel.boneTracks.callback;
+
+        this.generalPanel.boneTracks.callback = (toggle) ->
+        {
+            if (hostCallback != null)
+            {
+                hostCallback.accept(toggle);
+            }
+
+            if (this.form != null)
+            {
+                MobFormValues.of(this.form).bbsvanillabone$getBoneTracks().set(toggle.getValue());
+            }
+        };
+    }
+
+    /**
+     * Shows that same switch, at the form's current value.
+     *
+     * <p>Has to run after {@code super}, since the host's panel hides the switch for anything that
+     * is not a model form from inside its own startEdit.</p>
+     */
+    @Override
+    public void startEdit(MobForm form, Class<?> preferredPanel)
+    {
+        super.startEdit(form, preferredPanel);
+
+        this.generalPanel.boneTracks.setValue(MobFormValues.of(form).bbsvanillabone$getBoneTracks().get());
+        this.generalPanel.boneTracks.setVisible(true);
+        this.generalPanel.options.resize();
     }
 
     /**
@@ -133,22 +180,7 @@ public class UIVanillaBoneMobForm extends UIForm<MobForm>
             return null;
         }
 
-        /* FormUtils.additivePoseRotationBase weighs additivity over the two pose tracks the host's
-         * MobForm has, so it cannot see the recording overlays this addon adds. A multiplicative
-         * contributor in any track means the additive-base model does not apply at all, so those
-         * overlays are checked here — otherwise the answer would differ from bbs-fsv, which has all
-         * the tracks in one list. */
-        for (ValuePose overlay : MobFormValues.of(this.form).bbsvanillabone$getAdditionalOverlays())
-        {
-            PoseTransform poseTransform = overlay.get().transforms.get(bone);
-
-            if (poseTransform != null && (poseTransform.rotationMode == Transform.RotationMode.QUATERNION || poseTransform.fix != 0F))
-            {
-                return null;
-            }
-        }
-
-        return FormUtils.additivePoseRotationBase(this.form.pose, bone, this.getEvaluatedRotation(transition, this.bonePath()));
+        return MobFormPose.additiveRotationBase(this.form, this.form.pose, bone, this.getEvaluatedRotation(transition, this.bonePath()));
     }
 
     /**
