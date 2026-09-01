@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Discovers the baked model hierarchies owned by a vanilla entity renderer.
@@ -776,6 +777,28 @@ public final class VanillaRendererBones
                 this.scan(pair.getFirst(), primary, alternativeGroup);
                 this.scan(pair.getSecond(), primary, alternativeGroup);
             }
+
+            /* A lazy model holder — VanillaBackport's LazyModel and any other Supplier of a
+             * model — is opaque to the dispatch above, so its ModelPart tree was never
+             * discovered or tracked, which left those layers a frozen ghost instead of bones
+             * that follow the body. Resolve one level and re-dispatch: the holder memoizes,
+             * so the resolved instance is the same one the renderer draws every frame, and
+             * identity tracking in MobRenderContext works. A supplier of a supplier stops
+             * here, so a resolve chain cannot recurse. */
+            if (value instanceof Supplier<?> supplier)
+            {
+                if (this.visited.put(value, Boolean.TRUE) != null)
+                {
+                    return;
+                }
+
+                Object resolved = supplier.get();
+
+                if (resolved != null && !(resolved instanceof Supplier<?>))
+                {
+                    this.scan(resolved, primary, alternativeGroup);
+                }
+            }
         }
 
         private Discovery createDiscovery(long hierarchyRevision)
@@ -854,6 +877,17 @@ public final class VanillaRendererBones
             else if (value instanceof CompositeEntityModel<?> compositeModel)
             {
                 this.collectModelHierarchies(compositeModel.getParts(), found, visited);
+            }
+            else if (value instanceof Supplier<?> supplier)
+            {
+                Object resolved = supplier.get();
+
+                if (resolved != null && !(resolved instanceof Supplier<?>))
+                {
+                    this.collectModelHierarchies(resolved, found, visited);
+                }
+
+                return;
             }
 
             if (value instanceof Model)
