@@ -1,15 +1,22 @@
 package mcaxolotl.bbsvanillabone.client;
 
+import mcaxolotl.bbsvanillabone.BBSVanillaBoneAddon;
 import mcaxolotl.bbsvanillabone.client.forms.VanillaBoneMobFormRenderer;
 import mcaxolotl.bbsvanillabone.client.ui.UIVanillaBoneMobForm;
 import mchorse.bbs_mod.events.BBSAddonMod;
 import mchorse.bbs_mod.events.Subscribe;
 import mchorse.bbs_mod.events.register.RegisterClientSettingsEvent;
+import mchorse.bbs_mod.events.register.RegisterL10nEvent;
 import mchorse.bbs_mod.forms.FormUtilsClient;
 import mchorse.bbs_mod.forms.forms.MobForm;
+import mchorse.bbs_mod.resources.Link;
 import mchorse.bbs_mod.ui.forms.editors.UIFormEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Client half of the addon, picked up from the "bbs-client-addon" entrypoint. The host scans that
@@ -19,6 +26,53 @@ import org.slf4j.LoggerFactory;
 public class BBSVanillaBoneClientAddon implements BBSAddonMod
 {
     public static final Logger LOGGER = LoggerFactory.getLogger("bbsvanillabone");
+
+    /**
+     * The languages this addon ships strings for. Asked for anything else it hands back nothing:
+     * the host's loader reports a link it cannot resolve with a stack trace, once per language
+     * reload, and a missing translation is not worth one.
+     */
+    private static final Set<String> LANGUAGES = Set.of(
+        "ar_ar",
+        "de_de",
+        "en_us",
+        "es_es",
+        "fr_fr",
+        "hu_hu",
+        "id_id",
+        "ko_kr",
+        "pl_pl",
+        "pt_br",
+        "pt_pt",
+        "ru_ru",
+        "th_th",
+        "tr_tr",
+        "uk_ua",
+        "ur_pk",
+        "vi_vn",
+        "zh_cn",
+        "zh_tw"
+    );
+
+    /**
+     * The host posts this before it loads its own language files, precisely so an addon's labels are
+     * translated on first sight rather than showing their raw key until the next language switch.
+     *
+     * The links resolve against the addon's own asset source, registered by the common half — the
+     * host's "assets:" source already has a strings/en_us.json of its own to collide with.
+     */
+    @Subscribe
+    public void onRegisterL10n(RegisterL10nEvent event)
+    {
+        event.l10n.register(BBSVanillaBoneClientAddon::langFiles);
+    }
+
+    private static List<Link> langFiles(String lang)
+    {
+        return LANGUAGES.contains(lang)
+            ? Collections.singletonList(new Link(BBSVanillaBoneAddon.MOD_ID, "strings/" + lang + ".json"))
+            : Collections.emptyList();
+    }
 
     /**
      * Both registries are plain static maps keyed on the form class, so taking mob forms over is a

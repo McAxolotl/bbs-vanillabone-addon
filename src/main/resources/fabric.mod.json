@@ -11,6 +11,9 @@
 	"license": "MIT",
 	"environment": "client",
 	"entrypoints": {
+		"bbs-addon": [
+			"mcaxolotl.bbsvanillabone.BBSVanillaBoneAddon"
+		],
 		"bbs-client-addon": [
 			"mcaxolotl.bbsvanillabone.client.BBSVanillaBoneClientAddon"
 		]

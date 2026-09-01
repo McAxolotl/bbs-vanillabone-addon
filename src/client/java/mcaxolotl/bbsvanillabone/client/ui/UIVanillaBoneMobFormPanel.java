@@ -11,14 +11,15 @@ import mchorse.bbs_mod.ui.UIKeys;
 import mchorse.bbs_mod.ui.forms.editors.forms.UIForm;
 import mchorse.bbs_mod.ui.forms.editors.panels.UIFormPanel;
 import mchorse.bbs_mod.ui.forms.editors.panels.widgets.UIModelPoseEditor;
+import mchorse.bbs_mod.ui.framework.elements.UISection;
 import mchorse.bbs_mod.ui.framework.elements.buttons.UIButton;
 import mchorse.bbs_mod.ui.framework.elements.buttons.UIToggle;
 import mchorse.bbs_mod.ui.framework.elements.input.UIColor;
 import mchorse.bbs_mod.ui.framework.elements.input.UITexturePicker;
-import mchorse.bbs_mod.ui.framework.elements.input.list.UISearchList;
-import mchorse.bbs_mod.ui.framework.elements.input.list.UIStringList;
 import mchorse.bbs_mod.ui.framework.elements.input.text.UITextarea;
 import mchorse.bbs_mod.ui.framework.elements.input.text.utils.TextLine;
+import mchorse.bbs_mod.ui.framework.elements.overlay.UIListOverlayPanel;
+import mchorse.bbs_mod.ui.framework.elements.overlay.UIOverlay;
 import mchorse.bbs_mod.utils.colors.Color;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
@@ -41,11 +42,12 @@ public class UIVanillaBoneMobFormPanel extends UIFormPanel<MobForm>
 {
     private static final List<String> MOB_IDS = new ArrayList<>();
 
-    public UISearchList<String> mobID;
+    public UIButton pickMob;
     public UIButton pick;
     public UIColor color;
     public UIToggle paused;
     public UIToggle slim;
+    public UISection nbtSection;
     public UITextarea<TextLine> mobNBT;
     public UIModelPoseEditor poseEditor;
 
@@ -71,16 +73,22 @@ public class UIVanillaBoneMobFormPanel extends UIFormPanel<MobForm>
     {
         super(editor);
 
-        this.mobID = new UISearchList<>(new UIStringList((l) ->
+        this.pickMob = new UIButton(VanillaBoneKeys.FORMS_EDITORS_MOB_PICK_MOB, (b) ->
         {
-            this.form.mobID.set(l.get(0));
+            UIListOverlayPanel list = new UIListOverlayPanel(VanillaBoneKeys.FORMS_EDITORS_MOB_MOBS, (id) ->
+            {
+                this.form.mobID.set(id);
 
-            /* Rebuilds the panel: the bone tree belongs to the previous entity's model layers, and
-             * so does the stand-in entity the renderer discovers them from. */
-            this.editor.startEdit(this.form);
-        }));
-        this.mobID.list.background().add(MOB_IDS);
-        this.mobID.h(20 + 16 * 8);
+                /* Rebuilds the panel: the bone tree belongs to the previous entity's model layers,
+                 * and so does the stand-in entity the renderer discovers them from. */
+                this.editor.startEdit(this.form);
+            });
+
+            list.addValues(MOB_IDS);
+            list.setValue(this.form.mobID.get());
+
+            UIOverlay.addOverlay(this.getContext(), list);
+        });
 
         this.pick = new UIButton(UIKeys.FORMS_EDITOR_MODEL_PICK_TEXTURE, (b) ->
         {
@@ -96,11 +104,13 @@ public class UIVanillaBoneMobFormPanel extends UIFormPanel<MobForm>
         this.mobNBT = new UITextarea<>((t) -> this.form.mobNBT.set(t));
         this.mobNBT.background().h(160);
         this.mobNBT.wrap();
+        this.nbtSection = this.section(UIKeys.SELECTORS_NBT, "mob_nbt", false);
+        this.nbtSection.fields.add(this.mobNBT);
 
         this.poseEditor = new UIModelPoseEditor();
         this.poseEditor.transform.barBackground();
 
-        this.options.add(this.mobID, this.pick, this.color, this.paused);
+        this.options.add(this.pickMob, this.pick, this.color, this.paused);
     }
 
     /**
@@ -122,7 +132,6 @@ public class UIVanillaBoneMobFormPanel extends UIFormPanel<MobForm>
 
         MobFormValues values = MobFormValues.of(form);
 
-        this.mobID.list.setCurrentScroll(form.mobID.get());
         this.color.setColor(values.bbsvanillabone$getColor().get().getARGBColor());
         this.paused.setValue(values.bbsvanillabone$getPaused().get());
         this.slim.setValue(form.slim.get());
@@ -130,7 +139,7 @@ public class UIVanillaBoneMobFormPanel extends UIFormPanel<MobForm>
 
         this.slim.removeFromParent();
         this.poseEditor.removeFromParent();
-        this.mobNBT.removeFromParent();
+        this.nbtSection.removeFromParent();
 
         /* The slim toggle only applies to the player model — the tooltip already said so, now the
          * toggle follows: it appears only while a player mob is selected. */
@@ -140,8 +149,8 @@ public class UIVanillaBoneMobFormPanel extends UIFormPanel<MobForm>
         }
 
         this.options.add(this.poseEditor);
-        /* NBT last, under the bone editor. */
-        this.options.add(this.mobNBT);
+        /* NBT folds at the very bottom, under the bone editor. */
+        this.options.add(this.nbtSection);
         this.options.resize();
 
         BoneHierarchy hierarchy = this.getBoneHierarchy();
