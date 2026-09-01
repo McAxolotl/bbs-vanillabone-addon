@@ -116,7 +116,7 @@ public abstract class ModelPartMixin
     }
 
     @ModifyVariable(
-        method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V",
+        method = "renderCuboids(Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/VertexConsumer;III)V",
         at = @At("HEAD"),
         argsOnly = true,
         ordinal = 0
@@ -132,10 +132,10 @@ public abstract class ModelPartMixin
     }
 
     @ModifyArgs(
-        method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V",
+        method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;III)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/model/ModelPart;renderCuboids(Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"
+            target = "Lnet/minecraft/client/model/ModelPart;renderCuboids(Lnet/minecraft/client/util/math/MatrixStack$Entry;Lnet/minecraft/client/render/VertexConsumer;III)V"
         )
     )
     private void bbs$applyMobAppearance(Args args)
@@ -179,10 +179,15 @@ public abstract class ModelPartMixin
             a *= transform.color.a;
         }
 
-        args.set(4, (float) args.get(4) * r);
-        args.set(5, (float) args.get(5) * g);
-        args.set(6, (float) args.get(6) * b);
-        args.set(7, (float) args.get(7) * a);
+        /* 1.21.1 packs the colour as one ARGB int (ColorHelper$Argb order); the 1.20.x branch had
+         * four separate floats here. */
+        int packedColor = args.get(4);
+        int rr = (int) ((packedColor >> 16 & 0xff) * r);
+        int gg = (int) ((packedColor >> 8 & 0xff) * g);
+        int bb = (int) ((packedColor & 0xff) * b);
+        int aa = (int) ((packedColor >> 24 & 0xff) * a);
+
+        args.set(4, aa << 24 | rr << 16 | gg << 8 | bb);
     }
 
     private static final class DirectVertexConsumer implements VertexConsumer
@@ -195,7 +200,7 @@ public abstract class ModelPartMixin
         }
 
         @Override
-        public VertexConsumer vertex(double x, double y, double z)
+        public VertexConsumer vertex(float x, float y, float z)
         {
             this.consumer.vertex(x, y, z);
 
@@ -242,22 +247,5 @@ public abstract class ModelPartMixin
             return this;
         }
 
-        @Override
-        public void next()
-        {
-            this.consumer.next();
-        }
-
-        @Override
-        public void fixedColor(int red, int green, int blue, int alpha)
-        {
-            this.consumer.fixedColor(red, green, blue, alpha);
-        }
-
-        @Override
-        public void unfixColor()
-        {
-            this.consumer.unfixColor();
-        }
     }
 }

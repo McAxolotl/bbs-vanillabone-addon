@@ -879,12 +879,15 @@ public class VanillaBoneMobFormRenderer extends MobFormRenderer
         this.entity.setSneaking(source.isSneaking());
         this.entity.setSprinting(source.isSprinting());
         this.entity.setPose(source.isSneaking() ? EntityPose.CROUCHING : EntityPose.STANDING);
-        this.entity.equipStack(EquipmentSlot.MAINHAND, source.getEquipmentStack(EquipmentSlot.MAINHAND));
-        this.entity.equipStack(EquipmentSlot.OFFHAND, source.getEquipmentStack(EquipmentSlot.OFFHAND));
-        this.entity.equipStack(EquipmentSlot.HEAD, source.getEquipmentStack(EquipmentSlot.HEAD));
-        this.entity.equipStack(EquipmentSlot.CHEST, source.getEquipmentStack(EquipmentSlot.CHEST));
-        this.entity.equipStack(EquipmentSlot.LEGS, source.getEquipmentStack(EquipmentSlot.LEGS));
-        this.entity.equipStack(EquipmentSlot.FEET, source.getEquipmentStack(EquipmentSlot.FEET));
+        if (this.entity instanceof LivingEntity living)
+        {
+            living.equipStack(EquipmentSlot.MAINHAND, source.getEquipmentStack(EquipmentSlot.MAINHAND));
+            living.equipStack(EquipmentSlot.OFFHAND, source.getEquipmentStack(EquipmentSlot.OFFHAND));
+            living.equipStack(EquipmentSlot.HEAD, source.getEquipmentStack(EquipmentSlot.HEAD));
+            living.equipStack(EquipmentSlot.CHEST, source.getEquipmentStack(EquipmentSlot.CHEST));
+            living.equipStack(EquipmentSlot.LEGS, source.getEquipmentStack(EquipmentSlot.LEGS));
+            living.equipStack(EquipmentSlot.FEET, source.getEquipmentStack(EquipmentSlot.FEET));
+        }
 
         if (!paused)
         {
@@ -1237,7 +1240,7 @@ public class VanillaBoneMobFormRenderer extends MobFormRenderer
     private static class EmptyVertexConsumer implements VertexConsumer
     {
         @Override
-        public VertexConsumer vertex(double x, double y, double z)
+        public VertexConsumer vertex(float x, float y, float z)
         {
             return this;
         }
@@ -1272,16 +1275,5 @@ public class VanillaBoneMobFormRenderer extends MobFormRenderer
             return this;
         }
 
-        @Override
-        public void next()
-        {}
-
-        @Override
-        public void fixedColor(int red, int green, int blue, int alpha)
-        {}
-
-        @Override
-        public void unfixColor()
-        {}
     }
 }
