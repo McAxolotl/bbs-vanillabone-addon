@@ -3,12 +3,17 @@
 	"id": "bbsvanillabone",
 	"version": "${version}",
 	"name": "BBS Vanilla Bone Addon",
-	"description": "Vanilla model bone editing for BBS mob forms: model-layer bone names, matrix-stack pose injection and a bone editor panel.",
+	"description": "Per-bone posing, colouring and film animation for vanilla Minecraft mobs, right inside BBS mob forms.",
 	"authors": [
 		"McAxolotl"
 	],
-	"contact": {},
+	"contact": {
+		"homepage": "https://github.com/McAxolotl/bbs-vanillabone-addon",
+		"sources": "https://github.com/McAxolotl/bbs-vanillabone-addon",
+		"issues": "https://github.com/McAxolotl/bbs-vanillabone-addon/issues"
+	},
 	"license": "MIT",
+	"icon": "assets/bbsvanillabone/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"bbs-addon": [
