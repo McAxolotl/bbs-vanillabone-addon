@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "bbsvanillabone",
+	"version": "${version}",
+	"name": "BBS Vanilla Bone Addon",
+	"description": "Vanilla model bone editing for BBS mob forms: model-layer bone names, matrix-stack pose injection and a bone editor panel.",
+	"authors": [
+		"McAxolotl"
+	],
+	"contact": {},
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"bbs-client-addon": [
+			"mcaxolotl.bbsvanillabone.client.BBSVanillaBoneClientAddon"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.15.0",
+		"minecraft": "~1.20.4",
+		"java": ">=17",
+		"fabric-api": "*",
+		"bbs": "*"
+	}
+}

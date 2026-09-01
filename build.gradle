@@ -1,0 +1,67 @@
+plugins {
+	id 'fabric-loom' version '1.15-SNAPSHOT'
+}
+
+version = project.mod_version + "-" + project.minecraft_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = "Modrinth"
+				url = "https://api.modrinth.com/maven"
+			}
+		}
+		filter {
+			includeGroup "maven.modrinth"
+		}
+	}
+}
+
+loom {
+	/* The host splits its environments the same way; the client half of this addon needs to see
+	 * the host's client classes (FormUtilsClient, UIFormEditor). */
+	splitEnvironmentSourceSets()
+
+	mods {
+		"bbsvanillabone" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	/* Host, resolved from the Modrinth maven declared above. modImplementation puts it on the
+	 * compile classpath and into the dev run, so runClient launches against the real host. */
+	modImplementation "maven.modrinth:bbs-fs:${project.bbs_version}"
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 17
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
