@@ -10,7 +10,8 @@
 		"MobFormMixin",
 		"MobFormRendererAccessor",
 		"ModelPartAccessor",
-		"ModelPartMixin"
+		"ModelPartMixin",
+		"UIFormEditorMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
